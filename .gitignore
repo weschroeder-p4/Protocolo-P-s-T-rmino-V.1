@@ -1,0 +1,13 @@
+# Junk do macOS
+.DS_Store
+
+# Arquivos-fonte (originais pesados) — ficam de backup local, não vão pro GitHub
+assets/img/*.png
+# ...exceto os ícones realmente usados na página:
+!assets/img/favicon.png
+!assets/img/apple-touch-icon.png
+
+# WebP gerados que não são mais usados na página
+assets/img/app-mobile.webp
+assets/img/app-desktop.webp
+assets/img/ebook-cover.webp
