@@ -155,7 +155,11 @@ section { padding-block: clamp(56px, 9vw, 110px); position: relative; }
 .hero__logo .wm small { font-family: var(--sans); font-weight: 700; letter-spacing: .32em; font-size: .62rem; color: var(--areia); text-transform: uppercase; }
 .hero__logo .wm strong { font-family: var(--serif); font-weight: 400; font-size: 1.5rem; letter-spacing: .03em; color: var(--offwhite); }
 @media (max-width: 768px){
-  .hero__bg::after { background: linear-gradient(180deg, rgba(20,14,15,.72) 0%, rgba(20,14,15,.28) 40%, rgba(20,14,15,.66) 100%); }
+  /* texto no topo; herói mais alto p/ o casal começar DEPOIS do texto */
+  .hero { align-items: flex-start; min-height: 820px; min-height: 118svh; }
+  .hero .wrap { padding-block: 34px 0; }
+  .hero__bg img { object-position: center bottom; }
+  .hero__bg::after { background: linear-gradient(180deg, rgba(20,14,15,.9) 0%, rgba(20,14,15,.66) 30%, rgba(20,14,15,.15) 52%, rgba(20,14,15,.1) 100%); }
 }
 .hero__kw { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-bottom: 22px; }
 .hero__kw span { font-size: .7rem; letter-spacing: .24em; text-transform: uppercase; color: var(--areia); font-weight: 700; }
