@@ -19,37 +19,52 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="preload" as="image" href="assets/img/img_dobra1_desktop.webp" type="image/webp" fetchpriority="high" />
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@400;700;800&display=swap" rel="stylesheet" />
+
+<!-- Preload da imagem do HERO (LCP) — cada tamanho carrega só o seu arquivo -->
+<link rel="preload" as="image" href="assets/img/img_dobra1_mobile.webp" type="image/webp" media="(max-width: 768px)" fetchpriority="high" />
+<link rel="preload" as="image" href="assets/img/img_dobra1_desktop.webp" type="image/webp" media="(min-width: 769px)" fetchpriority="high" />
+
+<!-- Fontes sem bloquear a renderização (o texto aparece na hora) -->
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@400;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+<noscript><link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@400;700;800&display=swap" rel="stylesheet" /></noscript>
 
 <link rel="stylesheet" href="assets/css/brand.css" />
 
-<!-- Microsoft Clarity -->
-<script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "y188sn6vbg");
-</script>
-
-<!-- Meta Pixel Code -->
+<!-- Analytics (Clarity + Meta Pixel) — carregam após o hero, sem atrasar a 1ª dobra -->
 <script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '1242073104404770');
-fbq('track', 'PageView');
+(function(){
+  var carregado = false;
+  function carregarAnalytics(){
+    if (carregado) return; carregado = true;
+    // Microsoft Clarity
+    (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "y188sn6vbg");
+    // Meta Pixel
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1242073104404770');
+    fbq('track', 'PageView');
+  }
+  // Dispara logo após o carregamento inicial (ou na 1ª interação, o que vier antes)
+  if (document.readyState === 'complete') setTimeout(carregarAnalytics, 1200);
+  else window.addEventListener('load', function(){ setTimeout(carregarAnalytics, 1200); });
+  ['scroll','pointerdown','keydown','touchstart'].forEach(function(ev){
+    window.addEventListener(ev, function once(){ carregarAnalytics(); ['scroll','pointerdown','keydown','touchstart'].forEach(function(e){ window.removeEventListener(e, once); }); }, {once:true, passive:true});
+  });
+})();
 </script>
 <noscript><img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=1242073104404770&ev=PageView&noscript=1"
 /></noscript>
-<!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -190,9 +205,7 @@ src="https://www.facebook.com/tr?id=1242073104404770&ev=PageView&noscript=1"
   <div class="wrap">
     <div class="appzone">
       <div class="appzone__media">
-        <video class="app-video" autoplay muted loop playsinline preload="metadata" poster="assets/img/app-demo-poster.webp">
-          <source src="assets/img/app-demo-web.mp4" type="video/mp4" />
-        </video>
+        <video class="app-video" muted loop playsinline preload="none" poster="assets/img/app-demo-poster.webp" data-src="assets/img/app-demo-web.mp4"></video>
       </div>
       <div class="appzone__head">
         <p class="eyebrow">Tudo no aplicativo</p>
@@ -444,6 +457,25 @@ src="https://www.facebook.com/tr?id=1242073104404770&ev=PageView&noscript=1"
     else a.setAttribute('href', '#oferta'); // enquanto não houver checkout, rola até a oferta
   });
   document.getElementById('ano').textContent = new Date().getFullYear();
+
+  // ====== VÍDEO DO APP: só carrega/roda quando chega perto (economiza ~520 KiB no load) ======
+  (function(){
+    var v = document.querySelector('.app-video');
+    if (!v) return;
+    function ativar(){
+      if (v.dataset.loaded) return; v.dataset.loaded = "1";
+      var s = document.createElement('source');
+      s.src = v.getAttribute('data-src'); s.type = 'video/mp4';
+      v.appendChild(s); v.load();
+      var p = v.play(); if (p && p.catch) p.catch(function(){});
+    }
+    if ('IntersectionObserver' in window){
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){ if (e.isIntersecting){ ativar(); io.disconnect(); } });
+      }, { rootMargin: '300px 0px' });
+      io.observe(v);
+    } else { ativar(); }
+  })();
 
   // ====== BARRA FIXA: aparece 7s DEPOIS da página 100% carregada (mobile + desktop) ======
   (function(){
